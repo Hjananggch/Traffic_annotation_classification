@@ -1,2 +1,1 @@
-# Traffic_annotation_classification
- 这是一个交通标志图像分类任务，使用onnxruntime进行推理，同时使用gradio'和flask进行部署，快速且高效。
+这是一个交通标志图像分类任务，基于pytorch框架，其中图片类别一共有58个类别，训练了50个epochs的准确率为100%。

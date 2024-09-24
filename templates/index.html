@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检测页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4CAF50;
+            margin: 10px;
+        }
+        h1 {
+            margin: 0;
+            padding: 10px;
+            background-color: green;
+            color: white;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .image-box, .text-box {
+            width: 500px;
+            height: 300px;
+            border: 2px solid #ccc;
+            margin: 0 10px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #infoText {
+            width: 90%;
+            height: 90%;
+            padding: 10px;
+            background-color: #fff;
+            font-size: 16px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .upload-btn {
+            width: 200px;
+            height: 50px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        #footer {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="/static/avatar.jpg" alt="头像" id="avatar">
+        <h1>交通标志图像分类系统</h1>
+    </div>
+    <div class="image-container">
+        <div>
+            <div class="image-box">
+                <input type="file" accept="image/*" id="imageInput" style="display:none;" onchange="previewImage(event)">
+                <img id="uploadedImage" src="" alt="上传的图片" style="display:none;">
+            </div>
+            <div class="button-container">
+                <button class="upload-btn" onclick="document.getElementById('imageInput').click()">上传图片</button>
+                <button class="upload-btn" onclick="submitImage()">开始检测</button>
+            </div>
+        </div>
+        <div class="text-box">
+            <div id="infoText">模型推理结果>></div>
+        </div>
+    </div>
+    <div id="footer">作者：狗狗学不会</div>
+    <script>
+        let uploadedFile = null;
+
+        function previewImage(event) {
+            const imageBox = document.getElementById('uploadedImage');
+            uploadedFile = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                imageBox.src = e.target.result;
+                imageBox.style.display = 'block';
+            }
+            if (uploadedFile) {
+                reader.readAsDataURL(uploadedFile);
+            }
+        }
+
+        function submitImage() {
+            if (!uploadedFile) {
+                alert("请先上传一张图片！");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', uploadedFile);
+
+            fetch('http://127.0.0.1:5009/predict', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('infoText').innerText = "分类结果: " + data.result +
+                                                            "\n概率: " + JSON.stringify(data.probabilities) +
+                                                            "\n推理时间: " + data.infer_time + "秒";
+            })
+            .catch(error => {
+                console.error('发生错误:', error);
+            });
+        }
+    </script>
+</body>
+</html>
