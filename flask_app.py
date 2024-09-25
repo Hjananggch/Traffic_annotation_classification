@@ -57,6 +57,8 @@ def classify_image(image):
     outputs_softmax = softmax(outputs[0])  # Softmax
     probabilities = np.max(outputs_softmax, axis=1)  # 计算最大概率值
     predicted_idx = np.argmax(outputs[0], axis=1)  # 获取预测的类别索
+
+
     end_time = time.time()-start_time
 
     # 设置置信度阈值
